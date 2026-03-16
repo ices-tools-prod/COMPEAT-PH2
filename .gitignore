@@ -47,3 +47,11 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Copernicus marine executable
+copernicusmarine.exe
+
+# Data directory
+data
+model
+report
