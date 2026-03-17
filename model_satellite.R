@@ -46,6 +46,8 @@ results_list <- lapply(data_files, function(data_file) {
     .[, .(IndicatorId = 302, UnitId = Id, Year = year, Month = month, ES = mean, SD = stdev, N = count)]
 })
 
+result <- rbindlist(results_list)
+
 # Output annual monthly means --> UnitID, Year, Month, ES, SD, N, ND
-fwrite(exact_extracted_long, path_data_processed_monthly_means)
+fwrite(result, path_data_processed_monthly_means)
 
