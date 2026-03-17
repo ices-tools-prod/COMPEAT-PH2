@@ -29,6 +29,7 @@ if (!file.exists(executable_path)) {
 # Read units shape file
 units <- st_read(file.path("data", "units.shp"))
 
+# Get bounding box of units to subset satellite data
 bbox <- st_bbox(units)
 
 # If any of the data files exist, then skip this step, otherwise download data for all years
