@@ -6,7 +6,7 @@ path_data_processed <- file.path("data", "in-situ_processed.csv")
 path_data_processed_monthly_means <- file.path("model", "in-situ_processed_monthly_means.csv")
 
 # Read preprocessed station samples data
-station_samples <- fread(path_data_processed)
+station_samples <- data.table::fread(path_data_processed)
 
 # Filter stations rows and columns --> UnitID, Year, Month, Day, StationID, Depth, Chlorophyll
 wk <- station_samples[!is.na(Chlorophyll.a..CPHLZZXX_UGPL...ug.l.) & QV.ODV.Chlorophyll.a..CPHLZZXX_UGPL...ug.l. <= 1 & Depth..ADEPZZ01_ULAA...m. <= 10, .(IndicatorId = 301, UnitId = Id, Year = as.integer(substr(yyyy.mm.ddThh.mm.ss.sss, 1, 4)), Month = as.integer(substr(yyyy.mm.ddThh.mm.ss.sss, 6, 7)), Day = as.integer(substr(yyyy.mm.ddThh.mm.ss.sss, 9, 10)), StationId, Depth = Depth..ADEPZZ01_ULAA...m. ,ES = Chlorophyll.a..CPHLZZXX_UGPL...ug.l.)]

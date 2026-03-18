@@ -13,6 +13,7 @@
 #   cmems_obs-oc_atl_bgc-plankton_my_l3-multi-1km_P1D
 
 library(icesTAF)
+library(sf)
 
 executable_path <- file.path("copernicusmarine.exe")
 data_path <- file.path("data")
@@ -25,24 +26,34 @@ if (!file.exists(executable_path)) {
   download.file("https://github.com/mercator-ocean/copernicus-marine-toolbox/releases/download/v2.3.0/copernicusmarine.exe", executable_path, mode = "wb")
 }
 
-# If any of the data files exist, then skip this step, otherwise download data for all years
+# Read units shape file
+units <- st_read(file.path("data", "units.shp"))
+
+# Get bounding box of units to subset satellite data
+bbox <- st_bbox(units)
+
+# If the data files for years in sequence exist, then skip this step, otherwise download data for all missing years
+year_strings <- year_start:year_end
 data_files <- list.files(data_path, pattern = "satellite_.*\\.nc", full.names = TRUE)
-if (length(data_files) > 0) {
+years_present <- year_strings[sapply(year_strings, function(y) any(grepl(y, data_files)))]
+years_missing <- setdiff(year_strings, years_present)
+
+if (length(years_missing) == 0) {
   message("Data files already exist. Skipping download.")
 } else {
-  for (year in seq(year_start, year_end)) {
+  for (year in sort(years_missing)) {
     command <- paste(executable_path, "subset",
                      "--dataset-id ", dataset,
                      "--variable CHL",
-                     "--start-datetime", paste0(year, "-01-01"),
-                     "--end-datetime", paste0(year, "-12-31"),
-                     "--minimum-longitude -16.07389",
-                     "--maximum-longitude 12.67383",                   
-                     "--minimum-latitude 34.87719",
-                     "--maximum-latitude 63.88748",
+                     "--start-datetime ", paste0(year, "-01-01"),
+                     "--end-datetime ", paste0(year, "-12-31"),
+                     "--minimum-longitude ", bbox["xmin"],
+                     "--maximum-longitude ", bbox["xmax"],                   
+                     "--minimum-latitude ", bbox["ymin"],
+                     "--maximum-latitude ", bbox["ymax"],
                      "--disable-progress-bar",
-                     "--output-directory", data_path,
-                     "--output-filename", paste0("satellite_", year, ".nc"))
+                     "--output-directory ", data_path,
+                     "--output-filename" , paste0("satellite_", year, ".nc"))
     system(command)
   }
 }
