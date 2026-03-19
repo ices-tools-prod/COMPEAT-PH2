@@ -32,12 +32,18 @@ units <- st_read(file.path("data", "units.shp"))
 # Get bounding box of units to subset satellite data
 bbox <- st_bbox(units)
 
+# If the data files for years in sequence exist, then skip this step, otherwise download data for all missing years
+year_strings <- year_start:year_end
+
 # If any of the data files exist, then skip this step, otherwise download data for all years
 data_files <- list.files(data_path, pattern = "satellite_.*\\.nc", full.names = TRUE)
-if (length(data_files) > 0) {
+years_present <- year_strings[sapply(year_strings, function(y) any(grepl(y, data_files)))]
+years_missing <- setdiff(year_strings, years_present)
+
+if (length(years_missing) == 0) {
   message("Data files already exist. Skipping download.")
 } else {
-  for (year in seq(year_start, year_end)) {
+  for (year in sort(years_missing)) {
     command <- paste(executable_path, "subset",
                      "--dataset-id ", dataset,
                      "--variable CHL",
