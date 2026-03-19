@@ -34,6 +34,8 @@ bbox <- st_bbox(units)
 
 # If the data files for years in sequence exist, then skip this step, otherwise download data for all missing years
 year_strings <- year_start:year_end
+
+# If any of the data files exist, then skip this step, otherwise download data for all years
 data_files <- list.files(data_path, pattern = "satellite_.*\\.nc", full.names = TRUE)
 years_present <- year_strings[sapply(year_strings, function(y) any(grepl(y, data_files)))]
 years_missing <- setdiff(year_strings, years_present)

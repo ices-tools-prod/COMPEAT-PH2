@@ -5,6 +5,8 @@ library(sf)
 library(data.table)
 library(terra)
 library(exactextractr)
+library(dplyr)
+library(tidyr)
 
 data_path <- file.path("data")
 model_path <- file.path("model")
